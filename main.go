@@ -14,75 +14,71 @@ import (
 	"github.com/rs/cors"
 )
 
-var erc721ABI = `
-[
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    }
-]
-`
-
 var InitialCanvasKit = []byte(`
-[
-	{
-	  "type": "text",
-	  "text": "*Check address Galxe nft balance*",
-	  "style": "header"
-	},
-	{
-	  "type": "input",
-	  "id": "address",
-	  "label": "User Address",
-	  "placeholder": "0x..."
-	},
-	{
-	  "type": "input",
-	  "id": "spaceId",
-	  "label": "Space Id"
-	},
-	{
-	  "type": "text",
-	  "text": "*Or*",
-	  "style": "paragraph"
-	},
-	{
-	  "type": "input",
-	  "id": "campaignId",
-	  "label": "campaign Id"
-	},
-	{
-	  "type": "spacer",
-	  "size": "s"
-	},
-	{
-	  "type": "button",
-	  "id": "query-address",
-	  "label": "Check Address Balance",
-	  "style": "primary",
-	  "action": {
-		"type": "submit"
-	  }
+{
+	"content": {
+		"components": [
+			{
+				"type": "text",
+				"text": "*Check address Galxe nft balance*",
+				"style": "header"
+			},
+			{
+				"type": "spacer",
+				"size": "s"
+			},
+			{
+				"type": "input",
+				"id": "address",
+				"label": "User Address",
+				"placeholder": "0x..."
+			},
+			{
+				"type": "spacer",
+				"size": "s"
+			},
+			{
+				"type": "input",
+				"id": "spaceId",
+				"label": "Space Id"
+			},
+			{
+				"type": "text",
+				"text": "*Or*",
+				"style": "paragraph"
+			},
+			{
+				"type": "input",
+				"id": "campaignId",
+				"label": "campaign Id"
+			},
+			{
+				"type": "spacer",
+				"size": "s"
+			},
+			{
+				"type": "button",
+				"id": "query-address",
+				"label": "Check Address Balance",
+				"style": "primary",
+				"action": {
+					"type": "submit"
+				}
+			}
+		]
 	}
-]
+}
 `)
 
 type InitResponse struct {
+	Components []Component `json:"components"`
+}
+
+type CanvasContent struct {
+	Content ContentDetails `json:"content"`
+}
+
+type ContentDetails struct {
 	Components []Component `json:"components"`
 }
 
