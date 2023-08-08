@@ -10,7 +10,6 @@ import (
 	"sync"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	"github.com/machinebox/graphql"
 	"github.com/rs/cors"
 )
@@ -162,11 +161,6 @@ type CampaignComponent struct {
 }
 
 func main() {
-	// get port from evn
-	env := godotenv.Load(".env")
-	if env != nil {
-		log.Fatal("Error loading .env file")
-	}
 	r := mux.NewRouter()
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
@@ -178,6 +172,9 @@ func main() {
 	r.HandleFunc("/submit", Submit)
 
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	fmt.Println("Listening on " + port + "...")
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
