@@ -14,61 +14,53 @@ import (
 	"github.com/rs/cors"
 )
 
-var InitialCanvasKit = []byte(`
-{
-	"content": {
-		"components": [
-			{
-				"type": "text",
-				"text": "*Check address Galxe nft balance*",
-				"style": "header"
-			},
-			{
-				"type": "spacer",
-				"size": "s"
-			},
-			{
-				"type": "input",
-				"id": "address",
-				"label": "User Address",
-				"placeholder": "0x..."
-			},
-			{
-				"type": "spacer",
-				"size": "s"
-			},
-			{
-				"type": "input",
-				"id": "spaceId",
-				"label": "Space Id"
-			},
-			{
-				"type": "text",
-				"text": "*Or*",
-				"style": "paragraph"
-			},
-			{
-				"type": "input",
-				"id": "campaignId",
-				"label": "campaign Id"
-			},
-			{
-				"type": "spacer",
-				"size": "s"
-			},
-			{
-				"type": "button",
-				"id": "query-address",
-				"label": "Check Address Balance",
-				"style": "primary",
-				"action": {
-					"type": "submit"
-				}
-			}
-		]
-	}
+var InitialCanvasKit = []Component{
+	{
+		Type:  "text",
+		Text:  "*Check address Galxe nft balance*",
+		Style: "header",
+	},
+	{
+		Type: "spacer",
+		Size: "s",
+	},
+	{
+		Type:        "input",
+		Id:          "address",
+		Label:       "User Address",
+		Placeholder: "0x...",
+	},
+	{
+		Type: "spacer",
+		Size: "s",
+	},
+	{
+		Type:  "input",
+		Id:    "spaceId",
+		Label: "Space Id",
+	},
+	{
+		Type:  "text",
+		Text:  "*Or*",
+		Style: "paragraph",
+	},
+	{
+		Type:  "input",
+		Id:    "campaignId",
+		Label: "campaign Id",
+	},
+	{
+		Type: "spacer",
+		Size: "s",
+	},
+	{
+		Type:   "button",
+		Id:     "query-address",
+		Label:  "Check Address Balance",
+		Style:  "primary",
+		Action: Action{Type: "submit"},
+	},
 }
-`)
 
 type InitResponse struct {
 	Components []Component `json:"components"`
@@ -76,6 +68,10 @@ type InitResponse struct {
 
 type CanvasContent struct {
 	Content ContentDetails `json:"content"`
+}
+
+type CanvasResponse struct {
+	Canvas CanvasContent `json:"canvas"`
 }
 
 type ContentDetails struct {
@@ -180,9 +176,24 @@ func main() {
 
 func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("InitCanvasKit")
-	str := string(InitialCanvasKit)
+	// Construct the response
+	response := CanvasResponse{
+		Canvas: CanvasContent{
+			Content: ContentDetails{
+				Components: InitialCanvasKit,
+			},
+		},
+	}
+
+	// Marshal the response into JSON
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(str))
+	w.Write(responseJSON)
 }
 
 func Submit(w http.ResponseWriter, r *http.Request) {
