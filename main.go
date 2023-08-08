@@ -14,85 +14,87 @@ import (
 	"github.com/rs/cors"
 )
 
-var InitialCanvasKit = []Component{
-	{
-		Type:  "text",
-		Text:  "*Check address Galxe nft balance*",
-		Style: "header",
-	},
-	{
-		Type: "spacer",
-		Size: "s",
-	},
-	{
-		Type:        "input",
-		Id:          "address",
-		Label:       "User Address",
-		Placeholder: "0x...",
-	},
-	{
-		Type: "spacer",
-		Size: "s",
-	},
-	{
-		Type:  "input",
-		Id:    "spaceId",
-		Label: "Space Id",
-	},
-	{
-		Type:  "text",
-		Text:  "*Or*",
-		Style: "paragraph",
-	},
-	{
-		Type:  "input",
-		Id:    "campaignId",
-		Label: "campaign Id",
-	},
-	{
-		Type: "spacer",
-		Size: "s",
-	},
-	{
-		Type:   "button",
-		Id:     "query-address",
-		Label:  "Check Address Balance",
-		Style:  "primary",
-		Action: Action{Type: "submit"},
-	},
-}
+// var InitialCanvasKit = []Component{
+// 	{
+// 		Type:  "text",
+// 		Text:  "*Check address Galxe nft balance*",
+// 		Style: "header",
+// 	},
+// 	{
+// 		Type: "spacer",
+// 		Size: "s",
+// 	},
+// 	{
+// 		Type:        "input",
+// 		Id:          "address",
+// 		Label:       "User Address",
+// 		Placeholder: "0x...",
+// 	},
+// 	{
+// 		Type: "spacer",
+// 		Size: "s",
+// 	},
+// 	{
+// 		Type:  "input",
+// 		Id:    "spaceId",
+// 		Label: "Space Id",
+// 	},
+// 	{
+// 		Type:  "text",
+// 		Text:  "*Or*",
+// 		Style: "paragraph",
+// 	},
+// 	{
+// 		Type:  "input",
+// 		Id:    "campaignId",
+// 		Label: "campaign Id",
+// 	},
+// 	{
+// 		Type: "spacer",
+// 		Size: "s",
+// 	},
+// 	{
+// 		Type:   "button",
+// 		Id:     "query-address",
+// 		Label:  "Check Address Balance",
+// 		Style:  "primary",
+// 		Action: Action{Type: "submit"},
+// 	},
+// }
 
 type InitResponse struct {
 	Components []Component `json:"components"`
 }
 
-type CanvasContent struct {
-	Content ContentDetails `json:"content"`
+type Canvas struct {
+	Content Content `json:"content"`
 }
 
-type CanvasResponse struct {
-	Canvas CanvasContent `json:"canvas"`
-}
-
-type ContentDetails struct {
+type Content struct {
 	Components []Component `json:"components"`
 }
 
 type Component struct {
-	Type        string `json:"type"`
-	Text        string `json:"text,omitempty"`
-	Style       string `json:"style,omitempty"`
-	Id          string `json:"id,omitempty"`
-	Label       string `json:"label,omitempty"`
-	Placeholder string `json:"placeholder,omitempty"`
-	Size        string `json:"size,omitempty"`
-	Action      Action `json:"action,omitempty"`
+	Type        string   `json:"type"`
+	Text        string   `json:"text,omitempty"`
+	Style       string   `json:"style,omitempty"`
+	Id          string   `json:"id,omitempty"`
+	Label       string   `json:"label,omitempty"`
+	Placeholder string   `json:"placeholder,omitempty"`
+	Size        string   `json:"size,omitempty"`
+	Action      *Action  `json:"action,omitempty"`
+	Options     []Option `json:"options,omitempty"`
 }
 
 type Action struct {
-	Type string `json:"type,omitempty"`
+	Type string `json:"type"`
 }
 
+type Option struct {
+	Type string `json:"type"`
+	Id   string `json:"id"`
+	Text string `json:"text"`
+}
 type SubmitResponse struct {
 	UserAddress string `json:"userAddress"`
 	CampaignId  string `json:"campaignId"`
@@ -177,16 +179,62 @@ func main() {
 func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("InitCanvasKit")
 	// Construct the response
-	response := CanvasResponse{
-		Canvas: CanvasContent{
-			Content: ContentDetails{
-				Components: InitialCanvasKit,
+	canvas := Canvas{
+		Content: Content{
+			Components: []Component{
+				{
+					Type:  "text",
+					Text:  "*Check address Galxe nft balance*",
+					Style: "header",
+				},
+				{
+					Type: "spacer",
+					Size: "s",
+				},
+				{
+					Type:        "input",
+					Id:          "address",
+					Label:       "User Address",
+					Placeholder: "0x...",
+				},
+				{
+					Type: "spacer",
+					Size: "s",
+				},
+				{
+					Type:  "input",
+					Id:    "campaignId",
+					Label: "campaign Id",
+				},
+				{
+					Type:  "text",
+					Text:  "*Or*",
+					Style: "paragraph",
+				},
+				{
+					Type:  "input",
+					Id:    "spaceId",
+					Label: "Space Id",
+				},
+				{
+					Type: "spacer",
+					Size: "s",
+				},
+				{
+					Type:  "button",
+					Id:    "query-address",
+					Label: "Check Address Balance",
+					Style: "primary",
+					Action: &Action{ // <--- Take the address here
+						Type: "submit",
+					},
+				},
 			},
 		},
 	}
 
 	// Marshal the response into JSON
-	responseJSON, err := json.Marshal(response)
+	responseJSON, err := json.Marshal(canvas)
 	if err != nil {
 		http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
 		return
