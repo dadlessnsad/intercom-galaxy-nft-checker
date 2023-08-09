@@ -440,9 +440,15 @@ func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
 func BuildErrorComponents(err error) []Component {
 	var components []Component
 
+	// Check if the error is nil
+	errorMsg := "Unknown error occurred"
+	if err != nil {
+		errorMsg = err.Error()
+	}
+
 	components = append(components, Component{
 		Type:  "text",
-		Text:  fmt.Sprintf("Error: %s", err.Error()),
+		Text:  fmt.Sprintf("Error: %s", errorMsg),
 		Style: "header",
 	})
 
