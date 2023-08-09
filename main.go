@@ -267,25 +267,6 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 
-		// Extract components from the constructed response
-		components := response["canvas"].(Canvas).Content.Components
-
-		// Append the "Query Again" button
-		components = append(components, Component{
-			Type:   "button",
-			Id:     "query-again",
-			Label:  "Query Again",
-			Style:  "primary",
-			Action: &Action{Type: "init"},
-		})
-
-		// Reconstruct the response with the modified components
-		response["canvas"] = Canvas{
-			Content: Content{
-				Components: components,
-			},
-		}
-
 		// Marshal the response into JSON
 		responseJSON, err := json.Marshal(response)
 		if err != nil {
@@ -335,24 +316,6 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 				Content: Content{
 					Components: BuildCampaignComponents(campaigns),
 				},
-			},
-		}
-		// Extract components from the constructed response
-		components := response["canvas"].(Canvas).Content.Components
-
-		// Append the "Query Again" button
-		components = append(components, Component{
-			Type:   "button",
-			Id:     "query-again",
-			Label:  "Query Again",
-			Style:  "primary",
-			Action: &Action{Type: "init"},
-		})
-
-		// Reconstruct the response with the modified components
-		response["canvas"] = Canvas{
-			Content: Content{
-				Components: components,
 			},
 		}
 
@@ -468,6 +431,17 @@ func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
 		components = append(components, Component{
 			Type: "spacer",
 			Size: "s",
+		})
+
+		// add query again button
+		components = append(components, Component{
+			Type:  "button",
+			Id:    "refresh-button",
+			Label: "Refresh",
+			Style: "primary",
+			Action: &Action{
+				Type: "init",
+			},
 		})
 	}
 
