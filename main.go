@@ -432,17 +432,6 @@ func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
 			Type: "spacer",
 			Size: "s",
 		})
-
-		// add query again button
-		components = append(components, Component{
-			Type:  "button",
-			Id:    "refresh-button",
-			Label: "Refresh",
-			Style: "primary",
-			Action: &Action{
-				Type: "init",
-			},
-		})
 	}
 
 	return components
@@ -484,31 +473,10 @@ func BuildErrorComponents(err error) []Component {
 }
 
 func RenderErrorCanvas(w http.ResponseWriter, err error) {
-	// Check if the error is nil
-	errorMsg := "Unknown error occurred"
-	if err != nil {
-		errorMsg = err.Error()
-	}
-
 	response := map[string]interface{}{
 		"canvas": Canvas{
 			Content: Content{
-				Components: []Component{
-					{
-						Type:  "text",
-						Text:  errorMsg,
-						Style: "header",
-					},
-					{ // Add a "Query Again" button
-						Type:  "button",
-						Id:    "query-again",
-						Label: "Query Again",
-						Style: "primary",
-						Action: &Action{
-							Type: "init",
-						},
-					},
-				},
+				Components: BuildErrorComponents(err),
 			},
 		},
 	}
@@ -519,7 +487,7 @@ func RenderErrorCanvas(w http.ResponseWriter, err error) {
 		return
 	}
 
-	w.WriteHeader(http.StatusInternalServerError) // Use a 500 status for server errors
+	w.WriteHeader(http.StatusBadRequest)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseJSON)
 }
