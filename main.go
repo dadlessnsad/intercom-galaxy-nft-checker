@@ -257,6 +257,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("SubmitResponse:", res)
+
 	// Check for required fields
 	if res.UserAddress == "" {
 		http.Error(w, "UserAddress is required", http.StatusBadRequest)
@@ -281,20 +283,27 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		res, err := json.Marshal(campaignInfo)
+		response := map[string]interface{}{
+			"canvas": Canvas{
+				Content: Content{
+					Components: BuildCampaignComponents([]CampaignQueryResponse{campaignInfo}),
+				},
+			},
+		}
+
+		// Marshal the response into JSON
+		responseJSON, err := json.Marshal(response)
 		if err != nil {
-			log.Println("Error marshalling campaign:", err) // Enhanced logging here
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(res)
-
+		w.Write(responseJSON)
 	} else {
 		// query space
 		log.Println("Querying space:", res.SpaceId)
-		spaceInfo, err := QuerySpace(client, res.SpaceId, res.UserAddress)
+		spaceInfo, err := QuerySpace(client, res.SpaceId)
 		if err != nil {
 			log.Println("Error querying space:", err) // Enhanced logging here
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -325,18 +334,23 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 
 		wg.Wait() // Wait for all goroutines to finish
 
-		campaignComponents := BuildCampaignComponents(campaigns)
+		response := map[string]interface{}{
+			"canvas": Canvas{
+				Content: Content{
+					Components: BuildCampaignComponents(campaigns),
+				},
+			},
+		}
 
-		// Convert components to JSON and send the response
-		res, err := json.Marshal(campaignComponents)
+		// Marshal the response into JSON
+		responseJSON, err := json.Marshal(response)
 		if err != nil {
-			log.Println("Error marshalling campaign components:", err) // Enhanced logging here
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(res)
+		w.Write(responseJSON)
 	}
 }
 
@@ -377,7 +391,7 @@ func QueryCampaign(client *graphql.Client, id string, address string) (CampaignQ
 	return respData, nil
 }
 
-func QuerySpace(client *graphql.Client, id int, address string) (SpaceQueryResponse, error) {
+func QuerySpace(client *graphql.Client, id int) (SpaceQueryResponse, error) {
 	queryString := fmt.Sprintf(`
 	query {
 		space(id: %d) {
@@ -403,11 +417,11 @@ func QuerySpace(client *graphql.Client, id int, address string) (SpaceQueryRespo
 	return respData, nil
 }
 
-func BuildCampaignComponents(campaigns []CampaignQueryResponse) []CampaignComponent {
-	var components []CampaignComponent
+func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
+	var components []Component
 
 	for _, campaign := range campaigns {
-		component := CampaignComponent{
+		component := Component{
 			Type:  "text",
 			Text:  fmt.Sprintf("Campaign ID: %s, Name: %s, IsNftHolder: %v, ClaimedTimes: %d ", campaign.Campaign.ID, campaign.Campaign.Name, campaign.Campaign.IsNFTHolder, campaign.Campaign.ClaimedTimes),
 			Style: "paragraph",
