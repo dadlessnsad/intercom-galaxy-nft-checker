@@ -14,54 +14,6 @@ import (
 	"github.com/rs/cors"
 )
 
-// var InitialCanvasKit = []Component{
-// 	{
-// 		Type:  "text",
-// 		Text:  "*Check address Galxe nft balance*",
-// 		Style: "header",
-// 	},
-// 	{
-// 		Type: "spacer",
-// 		Size: "s",
-// 	},
-// 	{
-// 		Type:        "input",
-// 		Id:          "address",
-// 		Label:       "User Address",
-// 		Placeholder: "0x...",
-// 	},
-// 	{
-// 		Type: "spacer",
-// 		Size: "s",
-// 	},
-// 	{
-// 		Type:  "input",
-// 		Id:    "spaceId",
-// 		Label: "Space Id",
-// 	},
-// 	{
-// 		Type:  "text",
-// 		Text:  "*Or*",
-// 		Style: "paragraph",
-// 	},
-// 	{
-// 		Type:  "input",
-// 		Id:    "campaignId",
-// 		Label: "campaign Id",
-// 	},
-// 	{
-// 		Type: "spacer",
-// 		Size: "s",
-// 	},
-// 	{
-// 		Type:   "button",
-// 		Id:     "query-address",
-// 		Label:  "Check Address Balance",
-// 		Style:  "primary",
-// 		Action: Action{Type: "submit"},
-// 	},
-// }
-
 type InitResponse struct {
 	Components []Component `json:"components"`
 }
@@ -152,6 +104,17 @@ type CampaignComponent struct {
 	Type  string `json:"type"`
 	Text  string `json:"text"`
 	Style string `json:"style,omitempty"`
+}
+
+type Payload struct {
+	ConversationID int                    `json:"conversation_id"`
+	InboxAppID     int                    `json:"inbox_app_id"`
+	AdminID        int                    `json:"admin_id"`
+	AppID          string                 `json:"app_id"`
+	UserID         string                 `json:"user_id"`
+	ComponentID    string                 `json:"component_id"`
+	InputValues    SubmitResponse         `json:"input_values"`
+	CurrentCanvas  map[string]interface{} `json:"current_canvas"` // Or use a dedicated struct if needed
 }
 
 func main() {
@@ -250,13 +213,14 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Submit")
 
 	// read req body
-	log.Println("SubmitRequest:", r.Body)
-	var res SubmitResponse
-	err := json.NewDecoder(r.Body).Decode(&res)
+	var payload Payload
+	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	res := payload.InputValues
 
 	log.Println("SubmitResponse:", res)
 
