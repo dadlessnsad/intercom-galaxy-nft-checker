@@ -211,14 +211,18 @@ func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 
 func Submit(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Submit")
+	log.Println("SubmitRequest:", r.Body)
 
 	// read req body
 	var payload Payload
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
+		log.Println("SubmitError:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	log.Println("SubmitPayload:", payload)
 
 	res := payload.InputValues
 
