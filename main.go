@@ -194,15 +194,6 @@ func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 							Type: "submit",
 						},
 					},
-					{
-						Type:  "button",
-						Id:    "query-again",
-						Label: "Try Another Query",
-						Style: "primary",
-						Action: &Action{
-							Type: "init",
-						},
-					},
 				},
 			},
 		},
@@ -436,21 +427,11 @@ func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
 			Style: "paragraph",
 		})
 
-		// Add a spacer for better visual separation between campaigns
-		components = append(components, Component{
-			Type: "spacer",
-			Size: "s",
-		})
-
-		components = append(components, Component{
-			Type:  "button",
-			Id:    "refresh-button",
-			Label: "Refresh",
-			Style: "primary",
-			Action: &Action{
-				Type: "init",
-			},
-		})
+		// // Add a spacer for better visual separation between campaigns
+		// components = append(components, Component{
+		// 	Type: "spacer",
+		// 	Size: "s",
+		// })
 	}
 
 	return components
