@@ -219,6 +219,9 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//log body
+	log.Println("Submit:", payload)
+
 	res := payload.InputValues
 
 	spaceIdInt := 0
