@@ -190,8 +190,17 @@ func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 						Id:    "query-address",
 						Label: "Check Address Balance",
 						Style: "primary",
-						Action: &Action{ // <--- Take the address here
+						Action: &Action{
 							Type: "submit",
+						},
+					},
+					{
+						Type:  "button",
+						Id:    "query-again",
+						Label: "Try Another Query",
+						Style: "primary",
+						Action: &Action{
+							Type: "init",
 						},
 					},
 				},
@@ -431,6 +440,16 @@ func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
 		components = append(components, Component{
 			Type: "spacer",
 			Size: "s",
+		})
+
+		components = append(components, Component{
+			Type:  "button",
+			Id:    "refresh-button",
+			Label: "Refresh",
+			Style: "primary",
+			Action: &Action{
+				Type: "init",
+			},
 		})
 	}
 
