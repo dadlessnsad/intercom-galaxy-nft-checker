@@ -237,19 +237,17 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	log.Println("SubmitResponse:", res)
-
 	// Check for required fields
 	if res.UserAddress == "" {
 		log.Println("Error: UserAddress is required")
-		RenderErrorCanvas(w, err)
+		InitCanvasKit(w, r)
 		return
 	}
 
 	// Ensure at least one of SpaceId or CampaignId is provided
 	if spaceIdInt == 0 && res.CampaignId == "" {
 		log.Println("Error: SpaceId or CampaignId is required")
-		RenderErrorCanvas(w, err)
+		InitCanvasKit(w, r)
 		return
 	}
 
@@ -260,8 +258,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		// query campaign
 		campaignInfo, err := QueryCampaign(client, res.CampaignId, res.UserAddress)
 		if err != nil {
-			log.Println("Error querying campaign:", err) // Enhanced logging here
-			RenderErrorCanvas(w, err)
+			log.Println("Error querying campaign:", err)
+			InitCanvasKit(w, r)
 			return
 		}
 
@@ -304,7 +302,6 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		w.Write(responseJSON)
 	} else {
 		// query space
-		log.Println("Querying space:", spaceIdInt)
 		spaceInfo, err := QuerySpace(client, spaceIdInt)
 		if err != nil {
 			log.Println("Error querying space:", err) // Enhanced logging here
