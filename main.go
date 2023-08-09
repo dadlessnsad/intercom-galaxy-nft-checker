@@ -227,12 +227,14 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 
 	res := payload.InputValues
 
-	// Convert SpaceId from string to int
-	spaceIdInt, err := strconv.Atoi(res.SpaceId)
-	if err != nil {
-		log.Println("Error converting spaceId to int:", err)
-		http.Error(w, "Invalid spaceId format", http.StatusBadRequest)
-		return
+	spaceIdInt := 0
+	if res.SpaceId != "" {
+		spaceIdInt, err = strconv.Atoi(res.SpaceId)
+		if err != nil {
+			log.Println("Error converting spaceId to int:", err)
+			http.Error(w, "Invalid spaceId format", http.StatusBadRequest)
+			return
+		}
 	}
 
 	log.Println("SubmitResponse:", res)
