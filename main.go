@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -215,16 +214,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	var payload Payload
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		canvasErr := BuildErrorComponents(err)
 		log.Println("Error decoding request body:", err)
-		canvasErrJSON, err := json.Marshal(canvasErr)
-		if err != nil {
-			http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(canvasErrJSON)
+		RenderErrorCanvas(w, err)
 		return
 	}
 
@@ -234,16 +225,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	if res.SpaceId != "" {
 		spaceIdInt, err = strconv.Atoi(res.SpaceId)
 		if err != nil {
-			canvasErr := BuildErrorComponents(err)
 			log.Println("Error converting spaceId to int:", err)
-			canvasErrJSON, err := json.Marshal(canvasErr)
-			if err != nil {
-				http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(canvasErrJSON)
+			RenderErrorCanvas(w, err)
 			return
 		}
 	}
@@ -252,31 +235,15 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 
 	// Check for required fields
 	if res.UserAddress == "" {
-		canvasErr := BuildErrorComponents(errors.New("UserAddress is required"))
 		log.Println("Error: UserAddress is required")
-		canvasErrJSON, err := json.Marshal(canvasErr)
-		if err != nil {
-			http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(canvasErrJSON)
+		RenderErrorCanvas(w, err)
 		return
 	}
 
 	// Ensure at least one of SpaceId or CampaignId is provided
 	if spaceIdInt == 0 && res.CampaignId == "" {
-		canvasErr := BuildErrorComponents(errors.New("SpaceId or CampaignId is required"))
 		log.Println("Error: SpaceId or CampaignId is required")
-		canvasErrJSON, err := json.Marshal(canvasErr)
-		if err != nil {
-			http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(canvasErrJSON)
+		RenderErrorCanvas(w, err)
 		return
 	}
 
@@ -287,16 +254,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		// query campaign
 		campaignInfo, err := QueryCampaign(client, res.CampaignId, res.UserAddress)
 		if err != nil {
-			canvasErr := BuildErrorComponents(err)
 			log.Println("Error querying campaign:", err) // Enhanced logging here
-			canvasErrJSON, err := json.Marshal(canvasErr)
-			if err != nil {
-				http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(canvasErrJSON)
+			RenderErrorCanvas(w, err)
 			return
 		}
 
@@ -311,16 +270,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		// Marshal the response into JSON
 		responseJSON, err := json.Marshal(response)
 		if err != nil {
-			canvasErr := BuildErrorComponents(err)
 			log.Println("Error marshalling response:", err) // Enhanced logging here
-			canvasErrJSON, err := json.Marshal(canvasErr)
-			if err != nil {
-				http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(canvasErrJSON)
+			RenderErrorCanvas(w, err)
 			return
 		}
 
@@ -331,16 +282,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		log.Println("Querying space:", spaceIdInt)
 		spaceInfo, err := QuerySpace(client, spaceIdInt)
 		if err != nil {
-			canvasErr := BuildErrorComponents(err)
 			log.Println("Error querying space:", err) // Enhanced logging here
-			canvasErrJSON, err := json.Marshal(canvasErr)
-			if err != nil {
-				http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(canvasErrJSON)
+			RenderErrorCanvas(w, err)
 			return
 		}
 
@@ -356,16 +299,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 				defer wg.Done() // Decrement the WaitGroup counter when done
 				campaignInfo, err := QueryCampaign(client, campaignID, res.UserAddress)
 				if err != nil {
-					canvasErr := BuildErrorComponents(err)
 					log.Println("Error querying campaign:", err) // Enhanced logging here
-					canvasErrJSON, err := json.Marshal(canvasErr)
-					if err != nil {
-						http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-						return
-					}
-					w.WriteHeader(http.StatusInternalServerError)
-					w.Header().Set("Content-Type", "application/json")
-					w.Write(canvasErrJSON)
+					RenderErrorCanvas(w, err)
 					return
 				}
 				mu.Lock() // Lock the mutex
@@ -387,16 +322,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		// Marshal the response into JSON
 		responseJSON, err := json.Marshal(response)
 		if err != nil {
-			canvasErr := BuildErrorComponents(err)
 			log.Println("Error marshalling response:", err) // Enhanced logging here
-			canvasErrJSON, err := json.Marshal(canvasErr)
-			if err != nil {
-				http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(canvasErrJSON)
+			RenderErrorCanvas(w, err)
 			return
 		}
 
@@ -537,4 +464,24 @@ func BuildErrorComponents(err error) []Component {
 	})
 
 	return components
+}
+
+func RenderErrorCanvas(w http.ResponseWriter, err error) {
+	response := map[string]interface{}{
+		"canvas": Canvas{
+			Content: Content{
+				Components: BuildErrorComponents(err),
+			},
+		},
+	}
+
+	responseJSON, marshalErr := json.Marshal(response)
+	if marshalErr != nil {
+		http.Error(w, "Failed to marshal error response", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusBadRequest)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseJSON)
 }
