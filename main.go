@@ -401,12 +401,39 @@ func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
 	var components []Component
 
 	for _, campaign := range campaigns {
-		component := Component{
+		// Add campaign ID
+		components = append(components, Component{
 			Type:  "text",
-			Text:  fmt.Sprintf("Campaign ID: %s, Name: %s, IsNftHolder: %v, ClaimedTimes: %d ", campaign.Campaign.ID, campaign.Campaign.Name, campaign.Campaign.IsNFTHolder, campaign.Campaign.ClaimedTimes),
+			Text:  fmt.Sprintf("Campaign ID: %s", campaign.Campaign.ID),
+			Style: "header",
+		})
+
+		// Add campaign Name
+		components = append(components, Component{
+			Type:  "text",
+			Text:  fmt.Sprintf("Name: %s", campaign.Campaign.Name),
 			Style: "paragraph",
-		}
-		components = append(components, component)
+		})
+
+		// Add NFT Holder status
+		components = append(components, Component{
+			Type:  "text",
+			Text:  fmt.Sprintf("Is NFT Holder: %v", campaign.Campaign.IsNFTHolder),
+			Style: "paragraph",
+		})
+
+		// Add Claimed Times
+		components = append(components, Component{
+			Type:  "text",
+			Text:  fmt.Sprintf("Claimed Times: %d", campaign.Campaign.ClaimedTimes),
+			Style: "paragraph",
+		})
+
+		// Add a spacer for better visual separation between campaigns
+		components = append(components, Component{
+			Type: "spacer",
+			Size: "s",
+		})
 	}
 
 	return components
