@@ -267,6 +267,25 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 
+		// Extract components from the constructed response
+		components := response["canvas"].(Canvas).Content.Components
+
+		// Append the "Query Again" button
+		components = append(components, Component{
+			Type:   "button",
+			Id:     "query-again",
+			Label:  "Query Again",
+			Style:  "primary",
+			Action: &Action{Type: "init"},
+		})
+
+		// Reconstruct the response with the modified components
+		response["canvas"] = Canvas{
+			Content: Content{
+				Components: components,
+			},
+		}
+
 		// Marshal the response into JSON
 		responseJSON, err := json.Marshal(response)
 		if err != nil {
@@ -316,6 +335,24 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 				Content: Content{
 					Components: BuildCampaignComponents(campaigns),
 				},
+			},
+		}
+		// Extract components from the constructed response
+		components := response["canvas"].(Canvas).Content.Components
+
+		// Append the "Query Again" button
+		components = append(components, Component{
+			Type:   "button",
+			Id:     "query-again",
+			Label:  "Query Again",
+			Style:  "primary",
+			Action: &Action{Type: "init"},
+		})
+
+		// Reconstruct the response with the modified components
+		response["canvas"] = Canvas{
+			Content: Content{
+				Components: components,
 			},
 		}
 
@@ -473,10 +510,31 @@ func BuildErrorComponents(err error) []Component {
 }
 
 func RenderErrorCanvas(w http.ResponseWriter, err error) {
+	// Check if the error is nil
+	errorMsg := "Unknown error occurred"
+	if err != nil {
+		errorMsg = err.Error()
+	}
+
 	response := map[string]interface{}{
 		"canvas": Canvas{
 			Content: Content{
-				Components: BuildErrorComponents(err),
+				Components: []Component{
+					{
+						Type:  "text",
+						Text:  errorMsg,
+						Style: "header",
+					},
+					{ // Add a "Query Again" button
+						Type:  "button",
+						Id:    "query-again",
+						Label: "Query Again",
+						Style: "primary",
+						Action: &Action{
+							Type: "init",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -487,7 +545,7 @@ func RenderErrorCanvas(w http.ResponseWriter, err error) {
 		return
 	}
 
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(http.StatusInternalServerError) // Use a 500 status for server errors
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(responseJSON)
 }
