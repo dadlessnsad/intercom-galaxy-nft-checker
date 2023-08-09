@@ -118,6 +118,17 @@ type Payload struct {
 	CurrentCanvas  map[string]interface{} `json:"current_canvas"` // Or use a dedicated struct if needed
 }
 
+type DataTable struct {
+	Type  string       `json:"type"`
+	Items []FieldValue `json:"items"`
+}
+
+type FieldValue struct {
+	Type  string `json:"type"`
+	Field string `json:"field"`
+	Value string `json:"value"`
+}
+
 func main() {
 	r := mux.NewRouter()
 	c := cors.New(cors.Options{
@@ -396,45 +407,27 @@ func QuerySpace(client *graphql.Client, id int) (SpaceQueryResponse, error) {
 }
 
 func BuildCampaignComponents(campaigns []CampaignQueryResponse) []Component {
-	var components []Component
+	var items []FieldValue
 
 	for _, campaign := range campaigns {
-		// Add campaign ID
-		components = append(components, Component{
-			Type:  "text",
-			Text:  fmt.Sprintf("Campaign ID: %s", campaign.Campaign.ID),
-			Style: "header",
-		})
-
-		// Add campaign Name
-		components = append(components, Component{
-			Type:  "text",
-			Text:  fmt.Sprintf("Name: %s", campaign.Campaign.Name),
-			Style: "paragraph",
-		})
-
-		// Add NFT Holder status
-		components = append(components, Component{
-			Type:  "text",
-			Text:  fmt.Sprintf("Is NFT Holder: %v", campaign.Campaign.IsNFTHolder),
-			Style: "paragraph",
-		})
-
-		// Add Claimed Times
-		components = append(components, Component{
-			Type:  "text",
-			Text:  fmt.Sprintf("Claimed Times: %d", campaign.Campaign.ClaimedTimes),
-			Style: "paragraph",
-		})
-
-		// // Add a spacer for better visual separation between campaigns
-		// components = append(components, Component{
-		// 	Type: "spacer",
-		// 	Size: "s",
-		// })
+		// Convert campaign details to field-value pairs
+		items = append(items, FieldValue{Type: "field-value", Field: "Campaign ID", Value: campaign.Campaign.ID})
+		items = append(items, FieldValue{Type: "field-value", Field: "Name", Value: campaign.Campaign.Name})
+		items = append(items, FieldValue{Type: "field-value", Field: "Is NFT Holder", Value: fmt.Sprintf("%v", campaign.Campaign.IsNFTHolder)})
+		items = append(items, FieldValue{Type: "field-value", Field: "Claimed Times", Value: fmt.Sprintf("%d", campaign.Campaign.ClaimedTimes)})
 	}
 
-	return components
+	dataTable := DataTable{
+		Type:  "data-table",
+		Items: items,
+	}
+
+	return []Component{Component{Type: "data-table", Options: []Option{Option{Type: "field-value", Id: "data", Text: jsonMarshal(dataTable)}}}}
+}
+
+func jsonMarshal(v interface{}) string {
+	data, _ := json.Marshal(v)
+	return string(data)
 }
 
 func BuildErrorComponents(err error) []Component {
