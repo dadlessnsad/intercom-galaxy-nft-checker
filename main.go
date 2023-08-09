@@ -219,10 +219,13 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//log body
-	log.Println("Submit:", payload)
-
 	res := payload.InputValues
+
+	// if res is a empty object { }, return InitCanvasKit
+	if res == (SubmitResponse{}) {
+		InitCanvasKit(w, r)
+		return
+	}
 
 	spaceIdInt := 0
 	if res.SpaceId != "" {
