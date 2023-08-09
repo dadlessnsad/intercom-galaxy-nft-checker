@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/gorilla/mux"
@@ -50,7 +51,7 @@ type Option struct {
 type SubmitResponse struct {
 	UserAddress string `json:"address"`
 	CampaignId  string `json:"campaignId"`
-	SpaceId     int    `json:"spaceId"`
+	SpaceId     string `json:"spaceId"`
 }
 
 type CampaignQueryResponse struct {
@@ -226,6 +227,14 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 
 	res := payload.InputValues
 
+	// Convert SpaceId from string to int
+	spaceIdInt, err := strconv.Atoi(res.SpaceId)
+	if err != nil {
+		log.Println("Error converting spaceId to int:", err)
+		http.Error(w, "Invalid spaceId format", http.StatusBadRequest)
+		return
+	}
+
 	log.Println("SubmitResponse:", res)
 
 	// Check for required fields
@@ -235,7 +244,7 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Ensure at least one of SpaceId or CampaignId is provided
-	if res.SpaceId == 0 && res.CampaignId == "" {
+	if spaceIdInt == 0 && res.CampaignId == "" {
 		http.Error(w, "Either SpaceId or CampaignId must be provided", http.StatusBadRequest)
 		return
 	}
@@ -271,8 +280,8 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		w.Write(responseJSON)
 	} else {
 		// query space
-		log.Println("Querying space:", res.SpaceId)
-		spaceInfo, err := QuerySpace(client, res.SpaceId)
+		log.Println("Querying space:", spaceIdInt)
+		spaceInfo, err := QuerySpace(client, spaceIdInt)
 		if err != nil {
 			log.Println("Error querying space:", err) // Enhanced logging here
 			http.Error(w, err.Error(), http.StatusInternalServerError)
