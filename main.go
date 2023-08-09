@@ -179,54 +179,56 @@ func main() {
 func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("InitCanvasKit")
 	// Construct the response
-	canvas := Canvas{
-		Content: Content{
-			Components: []Component{
-				{
-					Type:  "text",
-					Text:  "*Check address Galxe nft balance*",
-					Style: "header",
-				},
-				{
-					Type: "spacer",
-					Size: "s",
-				},
-				{
-					Type:        "input",
-					Id:          "address",
-					Label:       "User Address",
-					Placeholder: "0x...",
-				},
-				{
-					Type: "spacer",
-					Size: "s",
-				},
-				{
-					Type:  "input",
-					Id:    "campaignId",
-					Label: "campaign Id",
-				},
-				{
-					Type:  "text",
-					Text:  "*Or*",
-					Style: "paragraph",
-				},
-				{
-					Type:  "input",
-					Id:    "spaceId",
-					Label: "Space Id",
-				},
-				{
-					Type: "spacer",
-					Size: "s",
-				},
-				{
-					Type:  "button",
-					Id:    "query-address",
-					Label: "Check Address Balance",
-					Style: "primary",
-					Action: &Action{ // <--- Take the address here
-						Type: "submit",
+	canvas := map[string]interface{}{
+		"canvas": Canvas{
+			Content: Content{
+				Components: []Component{
+					{
+						Type:  "text",
+						Text:  "*Check address Galxe nft balance*",
+						Style: "header",
+					},
+					{
+						Type: "spacer",
+						Size: "s",
+					},
+					{
+						Type:        "input",
+						Id:          "address",
+						Label:       "User Address",
+						Placeholder: "0x...",
+					},
+					{
+						Type: "spacer",
+						Size: "s",
+					},
+					{
+						Type:  "input",
+						Id:    "campaignId",
+						Label: "campaign Id",
+					},
+					{
+						Type:  "text",
+						Text:  "*Or*",
+						Style: "paragraph",
+					},
+					{
+						Type:  "input",
+						Id:    "spaceId",
+						Label: "Space Id",
+					},
+					{
+						Type: "spacer",
+						Size: "s",
+					},
+					{
+						Type:  "button",
+						Id:    "query-address",
+						Label: "Check Address Balance",
+						Style: "primary",
+						Action: &Action{ // <--- Take the address here
+							Type: "submit",
+						},
 					},
 				},
 			},
