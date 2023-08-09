@@ -96,7 +96,7 @@ type Option struct {
 	Text string `json:"text"`
 }
 type SubmitResponse struct {
-	UserAddress string `json:"userAddress"`
+	UserAddress string `json:"address"`
 	CampaignId  string `json:"campaignId"`
 	SpaceId     int    `json:"spaceId"`
 }
@@ -250,6 +250,7 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Submit")
 
 	// read req body
+	log.Println("SubmitRequest:", r.Body)
 	var res SubmitResponse
 	err := json.NewDecoder(r.Body).Decode(&res)
 	if err != nil {
