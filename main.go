@@ -149,7 +149,7 @@ func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 				Components: []Component{
 					{
 						Type:  "text",
-						Text:  "*Check address Galxe nft balance*",
+						Text:  "*Query Tool: Address NFT Balance*",
 						Style: "header",
 					},
 					{
@@ -160,7 +160,7 @@ func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 						Type:        "input",
 						Id:          "address",
 						Label:       "User Address",
-						Placeholder: "0x...",
+						Placeholder: "eg: 0x...",
 					},
 					{
 						Type: "spacer",
@@ -169,17 +169,19 @@ func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 					{
 						Type:  "input",
 						Id:    "campaignId",
-						Label: "campaign Id",
+						Label: "Campaign ID",
+						Placeholder: "eg: GCVeoUUV5e",
 					},
 					{
 						Type:  "text",
-						Text:  "*Or*",
+						Text:  "*OR*",
 						Style: "paragraph",
 					},
 					{
 						Type:  "input",
 						Id:    "spaceId",
-						Label: "Space Id",
+						Label: "Space ID",
+						Placeholder: "eg: 28",
 					},
 					{
 						Type: "spacer",
@@ -188,7 +190,7 @@ func InitCanvasKit(w http.ResponseWriter, r *http.Request) {
 					{
 						Type:  "button",
 						Id:    "query-address",
-						Label: "Check Address Balance",
+						Label: "Check Address",
 						Style: "primary",
 						Action: &Action{
 							Type: "submit",
@@ -331,7 +333,7 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			}(campaign.ID)
 		}
 
-		wg.Wait() // Wait for all goroutines to finish
+		wg.Wait() // Wait for all go routines to finish
 
 		response := map[string]interface{}{
 			"canvas": Canvas{
